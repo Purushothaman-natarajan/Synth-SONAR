@@ -4,6 +4,12 @@
 
 This repository provides an implementation of **Synth-SONAR**, a sonar image generation framework that combines **Style Injection** for diversity enhancement with fine-tuning techniques. It leverages **text-to-image diffusion models** alongside **GPT prompting** to generate realistic, high-quality sonar images.
 
+## Architecture
+
+<p align="center">
+<img src= "https://github.com/Purushothaman-natarajan/Synth-SONAR/blob/main/assets/Overall%20Architecture.jpg" width="1000" />
+</p>
+
 ## Style Injection in Synth-SONAR
 
 **Style Injection** enhances the diversity of the sonar images by blending stylistic elements into the generated content using a pre-trained diffusion model. The process involves three key steps:
