@@ -8,9 +8,9 @@
 
 # Synth-SONAR: Sonar Image Synthesis with Enhanced Diversity and Realism via Dual Diffusion Models and GPT Prompting
 
-[Purushothaman Natarajan](https://purushothaman-natarajan.github.io/), [Athira Nambiar](https://www.srmist.edu.in/faculty/dr-athira-m-nambiar/)
+[Purushothaman Natarajan](https://purushothaman-natarajan.github.io/), [Kamal Basha](https://scholar.google.com/citations?user=hKUW3CwAAAAJ&hl=en&oi=sra), [Athira Nambiar](https://www.srmist.edu.in/faculty/dr-athira-m-nambiar/)
 
-[[`Paper`](https://www.arxiv.org/pdf/2410.08612)] [[`BibTeX`](# Citation)]
+[[`Paper`](https://www.arxiv.org/pdf/2410.08612)] [[`BibTeX`](#Citation)]
 
 
 ## Overview
@@ -39,6 +39,21 @@ The overall architecture of Synth-SONAR consists of the following core component
 - **Style Images**: Utilize actual sonar images as style references.
 - **Content Generation**: Generate content images using a Stable Diffusion model, guided by prompts from GPT models.
 
+#### Create a Conda Environment
+
+```
+conda env create -f environment.yaml
+conda activate Synth-SONAR
+```
+
+#### Download StableDiffusion Weights
+
+Download the StableDiffusion weights from the [CompVis organization at Hugging Face](https://huggingface.co/CompVis/stable-diffusion-v-1-4-original)
+(download the `sd-v1-4.ckpt` file), and link them:
+```
+ln -s <path/to/model.ckpt> models/ldm/stable-diffusion-v1/model.ckpt 
+```
+
 #### Command:
 
 ```bash
@@ -55,6 +70,12 @@ python run_styleid.py --cnt data/cnt --sty data/sty --gamma 0.3 --T 1.5   # High
 ### Step 2: Fine-Tuning with Text-to-Image Training
 
 Once the initial images are generated, fine-tune the model using a limited dataset of images and corresponding prompts. You can choose between standard text-to-image training or LoRA fine-tuning based on your computational resources.
+
+Login to Hugging Face (for fine-tuning and using the models from Huggingface)
+
+```bash
+huggingface-cli login
+```
 
 #### Standard Fine-Tuning
 
@@ -83,8 +104,6 @@ accelerate launch --mixed_precision="fp16" ./text_to_image/train_text_to_image.p
 export MODEL_NAME="CompVis/stable-diffusion-v1-4"
 export DATASET_NAME="path_to_your_dataset"  # Create a folder with images and corresponding captions, then use create_metadata(data_to_json).py script to generate the JSON file.
 
-huggingface-cli login
-
 accelerate launch --mixed_precision="fp16" ./text_to_image/train_text_to_image_lora.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --dataset_name=$DATASET_NAME --caption_column="text" \
@@ -100,6 +119,8 @@ accelerate launch --mixed_precision="fp16" ./text_to_image/train_text_to_image_l
 ### Step 3: Generating More Images and Retraining
 
 After fine-tuning is complete, generate additional images and retrain the model to enhance diversity and generalization.
+
+-----
 
 ## Utilities for Metadata, Caption Generation, and Style-Based Clustering
 
@@ -129,7 +150,7 @@ To convert the image and caption pairs into a training-ready dataset, use the pr
    #### Command:
 
     ```bash
-    python create_metadata.py <image_folder>
+    python create_metadata(data_to_json).py <image_folder>
     ```
 
 2. **Expected Output:**
@@ -179,13 +200,8 @@ python luster_images_for_style_generalization.py <image_dir> --n_components 50 -
 ### Install Dependencies
 
 ```bash
-# Clone the Diffusers repository
-git clone https://github.com/huggingface/diffusers
-cd diffusers
-pip install .
-
-# Install example-specific requirements
-cd examples/text_to_image
+# Install text-to-image-specific requirements
+cd 'Synth-SONAR/text_to_image'
 pip install -r requirements.txt
 ```
 
@@ -276,6 +292,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For fine-tuning approaches and style-injection, please credit the original Hugging Face implementations:
 - Hugging Face Diffusers Fine-Tuning: [train_text_to_image.py](https://github.com/huggingface/diffusers/blob/main/examples/text_to_image/train_text_to_image.py)
 - LoRA Fine-Tuning with PEFT: [train_text_to_image_lo)ra.py](https://github.com/huggingface/diffusers/blob/main/examples/text_to_image/train_text_to_image_lora.py)
-- Style-Injection: [Style-ID](https://github.com/jiwoogit/StyleID)
+- Special thanks to the authors of Style-Injection: [Style-ID](https://github.com/jiwoogit/StyleID)
 
 ----
