@@ -19,20 +19,29 @@
 
 ## Architecture
 
-The overall architecture of Synth-SONAR consists of the following core components:
-
-1. **Data Ingestion and Metadata Generation**: Collect sonar images, annotate them with captions, and generate context-aware metadata using GPT or LLaMA models.
-2. **Style Injection**: Perform image-to-image generation by fusing style images (e.g., sonar textures) with content generated via diffusion models.
-3. **Dual Diffusion Models**: Combine standard diffusion and fine-tuning techniques to enhance image fidelity, diversity, and style coherence in text-to-image generation.
-4. **Fine-Tuning**: Utilize both text-to-image and LoRA-based fine-tuning approaches to improve the quality and realism of generated images.
-5. **Retraining and Iterative Enhancement**: Continuously retrain using generated images and captions to enhance diversity and realism further.
-6. **Clustering**: Apply style-based clustering to reduce stylistic similarity between images and improve overall image quality.
+Synth-SONAR's architecture is divided into three core phases, which focus on data acquisition, image generation, and fine-grained tuning for enhanced realism in sonar image synthesis:
 
 ![Overall Architecture](https://github.com/Purushothaman-natarajan/Synth-SONAR/blob/main/assets/Overall%20Architecture.jpg)
 
-## Style Injection in Synth-SONAR
+1. **Phase 1: Data Acquisition**
+   - **Input Sources**: Publicly available sonar images, S3 simulated images, and stylized sonar images ([`Style-Injection`](#Style-Injection-in-Synth-SONAR)) are gathered to serve as the primary data pool.
+   - **Low-Level Descriptions**: For each image, low-level descriptions are manually given, and further enhanced using GPT or using similar models. This metadata aids in structuring and annotating the data for further processing.
 
-**Style Injection** enhances the diversity of sonar images by blending stylistic elements into generated content using a pre-trained diffusion model. The process involves three key steps:
+2. **Phase 2: Training and Image Generation via Diffusion Models**
+   - **Diffusion Model for Coarse Images**: The collected data and low-level + high-level descriptions are passed into a diffusion model for image synthesis. The input prompt guides the generation process, and the model is fine-tuned to produce coarse sonar images.
+   - **Text Transformer Fine-Tuning**: A text transformer integrates GPT-generated descriptions with the diffusion process to enhance the alignment between the text prompts and the generated images. Fine-tuning methods, including LoRA-based techniques, are employed to further refine the generated images for more precise and high-quality output.
+   - **Coarse Image Output**: At the end of this phase, a coarse sonar image is produced, representing the foundational structure for more refined synthesis.
+
+3. **Phase 3: Fine-Grained Tuning and Generalization**
+   - **Diffusion Model for Fine-Grained Images**: In this phase, a second diffusion model is applied to refine and generate fine-grained sonar images from the coarse images. This model incorporates domain-specific language instructions (generated via GPT) to improve detail and realism.
+   - **Visual Language Model (VLM)**: The VLM plays a critical role in this phase by providing improved captions with the help of domain-specific language instructions. These enhanced captions guide the diffusion process, helping the model generate more realistic sonar textures and intricate fine details than in Phase-3.
+   - **Fine-Grained Image Output**: The final output of the process is a high-quality, fine-grained sonar image, synthesized through multiple refinement stages.
+     
+----
+
+## SONAR Image Synthesis using Synth-SONAR
+
+**Synth-SONAR** enhances the diversity of sonar images by blending stylistic elements into generated content using a pre-trained diffusion model. The process involves three key steps:
 
 ### Step 1: Image-to-Image Generation using Style Injection
 
@@ -71,11 +80,21 @@ python run_styleid.py --cnt data/cnt --sty data/sty --gamma 0.3 --T 1.5   # High
 
 Once the initial images are generated, fine-tune the model using a limited dataset of images and corresponding prompts. You can choose between standard text-to-image training or LoRA fine-tuning based on your computational resources.
 
-Login to Hugging Face (for fine-tuning and using the models from Huggingface)
+
+Initialize [🤗Accelerate](https://github.com/huggingface/accelerate/) environment with:
+
+```bash
+accelerate config
+```
+
+Login to Hugging Face to authenticate your token (for fine-tuning and using the models from Huggingface)
 
 ```bash
 huggingface-cli login
 ```
+
+If you have already cloned the Diffusers repo, then you won't need to go through these steps.
+
 
 #### Standard Fine-Tuning
 
@@ -120,120 +139,7 @@ accelerate launch --mixed_precision="fp16" ./text_to_image/train_text_to_image_l
 
 After fine-tuning is complete, generate additional images and retrain the model to enhance diversity and generalization.
 
------
-
-## Utilities for Metadata, Caption Generation, and Style-Based Clustering
-
-### Metadata Creation
-
-#### Preparing Image-Caption Dataset for Training
-
-To prepare your image-caption dataset for training, follow these steps:
-
-**Step 1: Organize Images and Captions**
-1. **Create a Folder:**
-   - Name the folder `dataset` (or any desired name).
-   - Place all images intended for training in this folder.
-   - Ensure each image has a corresponding caption in a text file (or use a `.csv` file if preferred).
-
-2. **Captions Format:**
-   - Captions should link to each image. You can do this by:
-     - Creating a separate text file for each image (e.g., `image1.jpg` → `image1.txt` containing the caption).
-     - Creating a single `.csv` file listing image names in one column and captions in another (e.g., `image1.jpg`, "A caption describing the image").
-
-**Step 2: Generate JSON Metadata for Training**
-To convert the image and caption pairs into a training-ready dataset, use the provided `create_metadata(data_to_json).py` script:
-
-1. **Run the Metadata Script:**
-   - Execute the `create_metadata(data_to_json).py` script with images and captions in a folder. This will automatically read images and captions and output a `metadata.jsonl` file in the correct format for training.
-
-   #### Command:
-
-    ```bash
-    python create_metadata(data_to_json).py <image_folder>
-    ```
-
-2. **Expected Output:**
-   - The `metadata.jsonl` will contain entries for each image with fields for:
-     - Image file path.
-     - Caption text.
-
-   Example JSON entry:
-   ```json
-   {
-     "file_name": "path_to_image/image1.jpg",
-     "caption": "A caption describing the image"
-   }
-   ```
-
-**Step 3: Feed the Dataset to the Model**
-Once the `dataset.json` is generated, feed this JSON into your training pipeline for training the text-to-image generation model.
-
----
-
-### Generating Captions
-
-#### Using GPT-3.5 Turbo:
-
-```bash
-python generate_captions_GPT.py <json_file>
-```
-
-#### Using LLaMA:
-
-```bash
-python generate_captions_llama.py <jsonl_file> --batch_size 8
-```
-
-### Clustering Sonar Images by Style
-
-Use the `cluster_images_for_style_generalization.py` script to cluster sonar images based on stylistic features using PCA and K-Means.
-
-#### Command:
-
-```bash
-python luster_images_for_style_generalization.py <image_dir> --n_components 50 --n_clusters 50
-```
-
-## Setup
-
-### Install Dependencies
-
-```bash
-# Install text-to-image-specific requirements
-cd 'Synth-SONAR/text_to_image'
-pip install -r requirements.txt
-```
-
-### Initialize Accelerate
-
-```bash
-accelerate config
-```
-
-### Login to Hugging Face (for fine-tuning and using the models from Huggingface)
-
-```bash
-huggingface-cli login
-```
-
-## Evaluation
-
-We employ [Art-FID](https://github.com/matthias-wright/art-fid) and [HistoGAN](https://github.com/mahmoudnafifi/HistoGAN) for quantitative evaluation.
-
-### Art-FID Evaluation
-
-```bash
-cd evaluation
-python eval_artfid.py --sty ../data/sty_eval --cnt ../data/cnt_eval --tar ../output
-```
-
-### Histogram Loss Evaluation
-
-```bash
-cd evaluation
-python eval_histogan.py --sty ../data/sty_eval --tar ../output
-```
+----
 
 ## Inference
 
@@ -268,6 +174,116 @@ image = pipe(prompt="A sonar image").images[0]
 image.save("sonar_image.png")
 ```
 
+-----
+
+
+## Utilities for Metadata, Caption Generation, and Style-Based Clustering
+
+### Metadata Creation
+
+#### Preparing Image-Caption Dataset for Training (Fine tunning Stable Diffusion for text-to-image synthesis)
+
+To prepare your image-caption dataset for training, follow these steps:
+
+**Step 1: Organize Images and Captions**
+1. **Create a Folder:**
+   - Name the folder `dataset` (or any desired name).
+   - Place all images intended for training in this folder.
+   - Ensure each image has a corresponding caption in a text file (or use a `.csv` file if preferred).
+
+2. **Captions Format:**
+   - Captions should link to each image. You can do this by:
+     - Creating a separate text file for each image (e.g., `image1.jpg` → `image1.txt` containing the caption).
+
+**Step 2: Generate JSON Metadata for Training**
+To convert the image and caption pairs into a training-ready dataset, use the provided `create_metadata(data_to_json).py` script:
+
+1. **Run the Metadata Script:**
+   - Execute the `create_metadata(data_to_json).py` script with images and captions in a folder. This will automatically read images and captions and output a `metadata.jsonl` file in the correct format for training.
+
+   #### Command:
+
+    ```bash
+    python create_metadata(data_to_json).py <image_folder>
+    ```
+
+2. **Expected Output:**
+   - The `metadata.jsonl` will contain entries for each image with fields for:
+     - Image file path.
+     - Caption text.
+
+   Example JSON entry:
+   ```json
+   {
+     "file_name": "path_to_image/image1.jpg",
+     "caption": "A caption describing the image"
+   }
+   ```
+
+**Step 3: Feed the Dataset to Fine Tune the Model**
+Once the `dataset.json` is generated, feed this JSON into your training pipeline for training the text-to-image generation model.
+
+---
+
+### Generating Low-level and High-level Captions
+
+#### Using GPT-3.5 Turbo:
+
+```bash
+python generate_captions_GPT.py <json_file>
+```
+
+#### Using LLaMA:
+
+```bash
+python generate_captions_llama.py <jsonl_file> --batch_size 8
+```
+
+### Clustering Sonar Images by Style
+
+Use the `cluster_images_for_style_generalization.py` script to cluster sonar images based on stylistic features using PCA and K-Means.
+
+#### Command:
+
+```bash
+python cluster_images_for_style_generalization.py <image_dir> --n_components 50 --n_clusters 50
+```
+
+----
+
+## Optional Setup to handle the changes in the Diffusers Library
+
+### Install Dependencies for text-to-image-specific requirements
+
+```bash
+# Install text-to-image-specific requirements
+cd 'Synth-SONAR/text_to_image'
+pip install -r requirements.txt
+```
+
+----
+
+
+## Evaluation
+
+We employ [Art-FID](https://github.com/matthias-wright/art-fid) and [HistoGAN](https://github.com/mahmoudnafifi/HistoGAN) for quantitative evaluation.
+
+### Art-FID Evaluation
+
+```bash
+cd evaluation
+python eval_artfid.py --sty ../data/sty_eval --cnt ../data/cnt_eval --tar ../output
+```
+
+### Histogram Loss Evaluation
+
+```bash
+cd evaluation
+python eval_histogan.py --sty ../data/sty_eval --tar ../output
+```
+
+----
+
 ## Citation
 
 ```bibtex
@@ -283,10 +299,6 @@ image.save("sonar_image.png")
 }
 ```
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Acknowledgments
 
 For fine-tuning approaches and style-injection, please credit the original Hugging Face implementations:
@@ -294,4 +306,10 @@ For fine-tuning approaches and style-injection, please credit the original Huggi
 - LoRA Fine-Tuning with PEFT: [train_text_to_image_lo)ra.py](https://github.com/huggingface/diffusers/blob/main/examples/text_to_image/train_text_to_image_lora.py)
 - Special thanks to the authors of Style-Injection: [Style-ID](https://github.com/jiwoogit/StyleID)
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ----
+
+
