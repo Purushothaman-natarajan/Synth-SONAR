@@ -24,7 +24,7 @@ Synth-SONAR's architecture is divided into three core phases, which focus on dat
 ![Overall Architecture](https://github.com/Purushothaman-natarajan/Synth-SONAR/blob/main/assets/Overall%20Architecture.jpg)
 
 1. **Phase 1: Data Acquisition**
-   - **Input Sources**: Publicly available sonar images, S3 simulated images, and stylized sonar images ([`Style-Injection`](#Style-Injection-in-Synth-SONAR)) are gathered to serve as the primary data pool.
+   - **Input Sources**: Publicly available sonar images, S3 simulated images, and stylized sonar images ([`Style-Injection`](#Step-1:-Image-to-Image-Generation-using-Style-Injection)) are gathered to serve as the primary data pool.
    - **Low-Level Descriptions**: For each image, low-level descriptions are manually given, and further enhanced using GPT or using similar models. This metadata aids in structuring and annotating the data for further processing.
 
 2. **Phase 2: Training and Image Generation via Diffusion Models**
