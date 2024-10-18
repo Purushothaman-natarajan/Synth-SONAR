@@ -1,15 +1,27 @@
 import json
 import os
 import torch
+import argparse
 from PIL import Image
 from transformers import AutoProcessor, AutoModelForPreTraining
 
-# Load model and processor
-model_name = "llava-hf/llava-1.5-7b-hf"
-processor = AutoProcessor.from_pretrained(model_name)
-model = AutoModelForPreTraining.from_pretrained(model_name).to("cpu")
+def main():
+    parser = argparse.ArgumentParser(description="Generate captions from side scan SONAR images using a VLM.")
+    parser.add_argument("jsonl_file", help="Path to the JSONL file containing image metadata.")
+    parser.add_argument("--batch_size", type=int, default=8, help="Batch size for processing images.")
+    parser.add_argument("--output_file", help="Optional path to save the updated JSONL file. If not provided, it overwrites the original.")
+    args = parser.parse_args()
 
-def generate_captions_vlm(image_path, captions):
+    model_name = "llava-hf/llava-1.5-7b-hf"
+    
+    # Load the processor and model
+    processor = AutoProcessor.from_pretrained(model_name)
+    model = AutoModelForPreTraining.from_pretrained(model_name).to("cpu")
+
+    # Process the JSONL file and generate captions
+    update_jsonl(args.jsonl_file, processor, model, args.batch_size, args.output_file)
+
+def generate_captions_vlm(image_path, captions, processor, model):
     # Load and preprocess the image
     try:
         image = Image.open(image_path).convert("RGB")
@@ -18,12 +30,14 @@ def generate_captions_vlm(image_path, captions):
         return ["Error"] * len(captions)
     
     # Prepare text prompts for each caption
-    prompts = [f"Given the side scan SONAR image and the caption: \"{caption}\", where PL__*, SH__*, CGM*, ASF*, TCM* represent the objects in the image, 
-                and AS__*, AP__*, SEF* represent the background. The numbers following these abbreviations can range from one to five digits. 
-                Provide the following descriptions:\n"
-               "1. A low-level description focusing on simple details and objects visible in the image.\n"
-               "2. A high-level description interpreting the scene or conveying a broader understanding based on the image and the given caption." 
-               for caption in captions]
+    prompts = [
+        f"Given the side scan SONAR image and the caption: \"{caption}\", where PL__*, SH__*, CGM*, ASF*, TCM* represent the objects in the image, "
+        f"and AS__*, AP__*, SEF* represent the background. The numbers following these abbreviations can range from one to five digits. "
+        "Provide the following descriptions:\n"
+        "1. A low-level description focusing on simple details and objects visible in the image.\n"
+        "2. A high-level description interpreting the scene or conveying a broader understanding based on the image and the given caption."
+        for caption in captions
+    ]
     
     try:
         # Tokenize and process each prompt with the image
@@ -68,9 +82,12 @@ def generate_captions_vlm(image_path, captions):
     return results
 
 # Function to update JSONL file in batches and print predicted and actual captions
-def update_jsonl(json_file_path, batch_size=8):
+def update_jsonl(json_file_path, processor, model, batch_size=8, output_file=None):
     updated_data = []
     items = []
+
+    # Use the provided output file or overwrite the input file
+    output_file = output_file or json_file_path
 
     # Read the JSONL file line by line
     with open(json_file_path, 'r') as f:
@@ -79,28 +96,40 @@ def update_jsonl(json_file_path, batch_size=8):
             file_name = item.get('file_name', '')
             caption = item.get('caption', '')  # Use the caption as the prompt
 
-            # Generate captions
-            image_path = os.path.join(os.path.dirname(json_file_path), file_name)
-            low_level_caption, high_level_caption = generate_captions_vlm(image_path, caption)
+            # Collect items in batch size
+            items.append(item)
 
-            # Print the original and generated captions
-            print(f"File Name: {file_name}")
-            print(f"Original Caption: {caption}")
-            print(f"Generated Low-Level Caption: {low_level_caption}")
-            print(f"Generated High-Level Caption: {high_level_caption}\n")
+            # When we have a batch, process it
+            if len(items) >= batch_size:
+                process_batch(items, json_file_path, processor, model)
+                items = []  # Clear after processing
 
-            # Update the JSON object with new captions
-            item['low_level_caption'] = low_level_caption
-            item['high_level_caption'] = high_level_caption
-            updated_data.append(item)
+        # Process remaining items
+        if items:
+            process_batch(items, json_file_path, processor, model)
 
     # Write the updated data back to the JSONL file
-    with open(json_file_path, 'w') as f:
+    with open(output_file, 'w') as f:
         for item in updated_data:
             f.write(json.dumps(item) + '\n')  # Write each object on a new line
 
-# Path to your JSONL file
-json_file_path = r"E:\Train T3\consolidate2_final\metadata.jsonl"
+def process_batch(items, json_file_path, processor, model):
+    for item in items:
+        file_name = item.get('file_name', '')
+        caption = [item.get('caption', '')]  # Process a single caption
 
-# Update JSONL with captions and print them in batches
-update_jsonl(json_file_path, batch_size=8)
+        # Generate captions
+        image_path = os.path.join(os.path.dirname(json_file_path), file_name)
+        low_level_caption, high_level_caption = generate_captions_vlm(image_path, caption, processor, model)[0]
+
+        # Print the original and generated captions
+        print(f"File Name: {file_name}")
+        print(f"Original Caption: {caption[0]}")
+        print(f"Generated Low-Level Caption: {low_level_caption}")
+        print(f"Generated High-Level Caption: {high_level_caption}\n")
+
+        # Update the JSON object with new captions
+        item['low_level_caption'] = low_level_caption
+        item['high_level_caption'] = high_level_caption
+        updated_data.append(item)
+

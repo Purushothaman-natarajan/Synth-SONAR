@@ -1,3 +1,4 @@
+import argparse
 import json
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -42,26 +43,32 @@ def generate_captions_llama(caption_texts):
     
     return low_level_captions, high_level_captions
 
-# Function to update JSONL file in batches and print predicted and actual captions
-def update_jsonl(json_file_path, batch_size=8):
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate low and high-level captions using LLaMA.")
+    parser.add_argument("jsonl_file", help="Path to the JSONL file containing captions.")
+    parser.add_argument("-b", "--batch_size", type=int, default=8, help="Batch size for processing captions.")
+    args = parser.parse_args()
+
     updated_data = []
     original_captions = []
     items = []
+    json_file_path = args.jsonl_file
 
     # Read the JSONL file line by line
-    with open(json_file_path, 'r') as f:
+    with open(args.jsonl_file, 'r') as f:
         for line in f:
             item = json.loads(line.strip())  # Load each JSON object
             original_captions.append(item.get('caption', ''))
             items.append(item)
 
             # Process in batches
-            if len(original_captions) == batch_size:
+            # If the batch size is reached, process the captions
+            if len(original_captions) == args.batch_size:
                 # Generate low and high-level captions in batch
                 low_level_captions, high_level_captions = generate_captions_llama(original_captions)
 
                 # Update each item with the generated captions
-                for i in range(batch_size):
+                for i in range(args.batch_size):
                     print(f"Original Caption: {original_captions[i]}")
                     print(f"Generated Low-Level Caption: {low_level_captions[i]}")
                     print(f"Generated High-Level Caption: {high_level_captions[i]}\n")
@@ -74,6 +81,7 @@ def update_jsonl(json_file_path, batch_size=8):
                 original_captions = []
                 items = []
 
+        # Process any remaining captions that didn't fill the last batch
         # Handle remaining items if they don't fill the last batch
         if original_captions:
             low_level_captions, high_level_captions = generate_captions_llama(original_captions)
@@ -91,9 +99,3 @@ def update_jsonl(json_file_path, batch_size=8):
     with open(json_file_path, 'w') as f:
         for item in updated_data:
             f.write(json.dumps(item) + '\n')  # Write each object on a new line
-
-# Path to your JSONL file
-json_file_path = r"E:\Train T3\consolidate2_final\metadata.jsonl"
-
-# Update JSONL with captions and print them in batches
-update_jsonl(json_file_path, batch_size=8)
