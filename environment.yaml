@@ -1,4 +1,4 @@
-name: StyleID
+name: Synth-SONAR
 channels:
   - pytorch
   - defaults
