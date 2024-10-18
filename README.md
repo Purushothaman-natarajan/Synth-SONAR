@@ -195,7 +195,7 @@ To prepare your image-caption dataset for training, follow these steps:
    - Captions should link to each image. You can do this by:
      - Creating a separate text file for each image (e.g., `image1.jpg` → `image1.txt` containing the caption).
 
-**Step 2: Generate JSON Metadata for Training**
+**Step 2: Generate JSON Metadata for Training:**
 To convert the image and caption pairs into a training-ready dataset, use the provided `create_metadata(data_to_json).py` script:
 
 1. **Run the Metadata Script:**
