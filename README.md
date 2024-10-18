@@ -263,27 +263,6 @@ pip install -r requirements.txt
 
 ----
 
-
-## Evaluation
-
-We employ [Art-FID](https://github.com/matthias-wright/art-fid) and [HistoGAN](https://github.com/mahmoudnafifi/HistoGAN) for quantitative evaluation.
-
-### Art-FID Evaluation
-
-```bash
-cd evaluation
-python eval_artfid.py --sty ../data/sty_eval --cnt ../data/cnt_eval --tar ../output
-```
-
-### Histogram Loss Evaluation
-
-```bash
-cd evaluation
-python eval_histogan.py --sty ../data/sty_eval --tar ../output
-```
-
-----
-
 ## Citation
 
 ```bibtex
