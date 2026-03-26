@@ -322,22 +322,106 @@
             color: var(--accent);
         }
         
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+        
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.5rem;
+            header {
+                padding: 40px 15px;
             }
-            .architecture-content {
+            header h1 {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            .badges {
+                gap: 8px;
+            }
+            .badge {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            .section-title h2 {
+                font-size: 1.75rem;
+            }
+            nav {
+                overflow-x: auto;
+            }
+            nav ul {
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                padding: 12px 15px;
+                gap: 20px;
+            }
+            nav a {
+                white-space: nowrap;
+                font-size: 0.9rem;
+            }
+            section {
+                padding: 40px 15px;
+            }
+            .features-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .feature-card {
+                padding: 20px;
+            }
+            .feature-card i {
+                font-size: 2rem;
+            }
+            .arch-image img {
+                max-width: 100%;
+                height: auto;
             }
             .phase-list {
                 grid-template-columns: 1fr;
-            }
-            .steps {
-                grid-template-columns: 1fr;
-            }
-            nav ul {
-                flex-wrap: wrap;
                 gap: 15px;
+            }
+            .phase-item {
+                padding: 15px;
+            }
+            .phase-item strong {
+                font-size: 1rem;
+            }
+            .phase-item p {
+                font-size: 0.85rem;
+            }
+            .docs-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .doc-card {
+                padding: 20px;
+            }
+            .code-block {
+                padding: 15px;
+                font-size: 0.75rem;
+                white-space: pre;
+                overflow-x: scroll;
+            }
+            .citation pre {
+                font-size: 0.75rem;
+                padding: 15px;
+            }
+            footer {
+                padding: 30px 15px;
+            }
+            .links {
+                gap: 20px;
+            }
+            .links a {
+                font-size: 1rem;
             }
         }
     </style>
