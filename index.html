@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Synth-SONAR: Sonar Image Synthesis with Enhanced Diversity and Realism</title>
+    <meta name="description" content="Synth-SONAR is a sonar image generation framework integrating Style Injection, dual diffusion models, and GPT-based prompting for realistic, high-quality sonar image synthesis.">
+    <meta name="keywords" content="sonar image synthesis, deep learning, diffusion models, Style Injection, GPT prompting, computer vision, image generation, PyTorch, Stable Diffusion">
+    <meta name="author" content="Purushothaman Natarajan, Kamal Basha, Athira Nambiar">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Synth-SONAR: Sonar Image Synthesis">
+    <meta property="og:description" content="Sonar Image Synthesis with Enhanced Diversity and Realism via Dual Diffusion Models and GPT Prompting">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://purushothaman-natarajan.github.io/Synth-SONAR/">
+    <meta property="og:image" content="https://purushothaman-natarajan.github.io/Synth-SONAR/assets/Overall Architecture.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Synth-SONAR: Sonar Image Synthesis">
+    <meta name="twitter:description" content="Sonar Image Synthesis with Enhanced Diversity and Realism via Dual Diffusion Models and GPT Prompting">
+    <meta name="twitter:image" content="https://purushothaman-natarajan.github.io/Synth-SONAR/assets/Overall Architecture.jpg">
+    <link rel="canonical" href="https://purushothaman-natarajan.github.io/Synth-SONAR/">
+    <link rel="alternate" hreflang="en" href="https://purushothaman-natarajan.github.io/Synth-SONAR/">
+    <link rel="sitemap" type="application/xml" href="/Synth-SONAR/sitemap.xml">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -398,27 +414,25 @@
                 <h2>Architecture</h2>
                 <p>How Synth-SONAR combines multiple AI techniques for sonar image synthesis</p>
             </div>
-            <div class="architecture-content">
-                <div class="arch-image">
-                    <img src="assets/Overall Architecture.jpg" alt="Synth-SONAR Architecture">
-                </div>
-                <div>
-                    <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Three-Phase Pipeline</h3>
-                    <ul class="phase-list">
-                        <li class="phase-item">
-                            <strong>Phase 1: Data Acquisition</strong>
-                            <p>Gather publicly available sonar images, S3 simulated images, and stylized sonar images. Create low-level descriptions manually or via GPT.</p>
-                        </li>
-                        <li class="phase-item">
-                            <strong>Phase 2: Training & Coarse Generation</strong>
-                            <p>Use diffusion models with GPT-generated prompts to produce coarse sonar images. Fine-tune text transformers with LoRA for better alignment.</p>
-                        </li>
-                        <li class="phase-item">
-                            <strong>Phase 3: Fine-Grained Tuning</strong>
-                            <p>Apply a second diffusion model to refine coarse images. Use VLM with domain-specific instructions for enhanced realism and details.</p>
-                        </li>
-                    </ul>
-                </div>
+            <div class="arch-image" style="text-align: center; margin-bottom: 40px;">
+                <img src="assets/Overall Architecture.jpg" alt="Synth-SONAR Architecture" style="max-width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            </div>
+            <div class="phase-section">
+                <h3 style="text-align: center; margin-bottom: 30px; font-size: 1.5rem;">Three-Phase Pipeline</h3>
+                <ul class="phase-list">
+                    <li class="phase-item">
+                        <strong>Phase 1: Data Acquisition</strong>
+                        <p>Gather publicly available sonar images, S3 simulated images, and stylized sonar images. Create low-level descriptions manually or via GPT.</p>
+                    </li>
+                    <li class="phase-item">
+                        <strong>Phase 2: Training & Coarse Generation</strong>
+                        <p>Use diffusion models with GPT-generated prompts to produce coarse sonar images. Fine-tune text transformers with LoRA for better alignment.</p>
+                    </li>
+                    <li class="phase-item">
+                        <strong>Phase 3: Fine-Grained Tuning</strong>
+                        <p>Apply a second diffusion model to refine coarse images. Use VLM with domain-specific instructions for enhanced realism and details.</p>
+                    </li>
+                </ul>
             </div>
         </div>
     </section>
