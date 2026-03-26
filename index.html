@@ -162,21 +162,31 @@
         }
         
         .phase-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
             list-style: none;
         }
         
-        .phase-list li {
-            padding: 20px;
-            margin-bottom: 15px;
+        .phase-item {
             background: var(--light);
             border-radius: 10px;
-            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-top: 4px solid var(--primary);
         }
         
-        .phase-list li strong {
+        .phase-item strong {
             color: var(--primary);
             display: block;
-            margin-bottom: 5px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .phase-item p {
+            font-size: 0.9rem;
+            line-height: 1.5;
         }
         
         .docs-grid {
@@ -303,6 +313,9 @@
             .architecture-content {
                 grid-template-columns: 1fr;
             }
+            .phase-list {
+                grid-template-columns: 1fr;
+            }
             .steps {
                 grid-template-columns: 1fr;
             }
@@ -392,17 +405,17 @@
                 <div>
                     <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Three-Phase Pipeline</h3>
                     <ul class="phase-list">
-                        <li>
+                        <li class="phase-item">
                             <strong>Phase 1: Data Acquisition</strong>
-                            Gather publicly available sonar images, S3 simulated images, and stylized sonar images. Create low-level descriptions manually or via GPT.
+                            <p>Gather publicly available sonar images, S3 simulated images, and stylized sonar images. Create low-level descriptions manually or via GPT.</p>
                         </li>
-                        <li>
+                        <li class="phase-item">
                             <strong>Phase 2: Training & Coarse Generation</strong>
-                            Use diffusion models with GPT-generated prompts to produce coarse sonar images. Fine-tune text transformers with LoRA for better alignment.
+                            <p>Use diffusion models with GPT-generated prompts to produce coarse sonar images. Fine-tune text transformers with LoRA for better alignment.</p>
                         </li>
-                        <li>
+                        <li class="phase-item">
                             <strong>Phase 3: Fine-Grained Tuning</strong>
-                            Apply a second diffusion model to refine coarse images. Use VLM with domain-specific instructions for enhanced realism and details.
+                            <p>Apply a second diffusion model to refine coarse images. Use VLM with domain-specific instructions for enhanced realism and details.</p>
                         </li>
                     </ul>
                 </div>
@@ -550,7 +563,7 @@ python generate_captions_llama.py &lt;jsonl_file&gt; --batch_size 8</code>
                 <a href="https://www.arxiv.org/pdf/2410.08612" target="_blank"><i class="fas fa-file-pdf"></i> Paper</a>
                 <a href="https://purushothaman-natarajan.github.io/" target="_blank"><i class="fas fa-globe"></i> Author Website</a>
             </div>
-            <p>Synth-SONAR &copy; 2024 Purushothaman Natarajan, Kamal Basha, Athira Nambiar</p>
+            <p>Synth-SONAR &copy; 2024 Purushothaman Natarajan</p>
             <p style="margin-top: 10px; opacity: 0.7;">MIT License</p>
         </div>
     </footer>
