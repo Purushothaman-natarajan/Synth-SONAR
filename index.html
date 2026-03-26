@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synth-SONAR: Sonar Image Synthesis with Enhanced Diversity and Realism</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --accent: #06b6d4;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --text: #334155;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--dark) 0%, #0f172a 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #60a5fa, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .badge {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            list-style: none;
+            padding: 15px 0;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .architecture {
+            background: white;
+        }
+        
+        .architecture-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        
+        .arch-image img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .phase-list {
+            list-style: none;
+        }
+        
+        .phase-list li {
+            padding: 20px;
+            margin-bottom: 15px;
+            background: var(--light);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .phase-list li strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        
+        .doc-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        .doc-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(37,99,235,0.1);
+        }
+        
+        .doc-card i {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .doc-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .code-block code {
+            color: #9cdcfe;
+        }
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        
+        .step-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .citation {
+            background: white;
+        }
+        
+        .citation pre {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+        
+        footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .links a {
+            color: white;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        
+        .links a:hover {
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+            .architecture-content {
+                grid-template-columns: 1fr;
+            }
+            .steps {
+                grid-template-columns: 1fr;
+            }
+            nav ul {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Synth-SONAR</h1>
+            <p>Sonar Image Synthesis with Enhanced Diversity and Realism via Dual Diffusion Models and GPT Prompting</p>
+            <div class="badges">
+                <span class="badge"><i class="fas fa-file-alt"></i> MIT License</span>
+                <span class="badge"><i class="fab fa-python"></i> Python 3.8+</span>
+                <span class="badge"><i class="fas fa-fire"></i> PyTorch</span>
+                <span class="badge"><i class="fas fa-images"></i> Stable Diffusion</span>
+                <span class="badge"><i class="fas fa-robot"></i> GPT Prompting</span>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#docs">Docs</a></li>
+            <li><a href="#quickstart">Quick Start</a></li>
+            <li><a href="#citation">Citation</a></li>
+        </ul>
+    </nav>
+    
+    <section id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Synth-SONAR?</h2>
+                <p>Powerful, flexible, and easy-to-use sonar image synthesis framework</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-palette"></i>
+                    <h3>Style Injection</h3>
+                    <p>Enhance diversity by blending stylistic elements from real sonar images into generated content using pre-trained diffusion models.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-layer-group"></i>
+                    <h3>Dual Diffusion Models</h3>
+                    <p>Two-phase generation process produces coarse images first, then refines them for fine-grained details and realism.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>GPT-Based Prompting</h3>
+                    <p>Generate high-quality text prompts using GPT models to guide the diffusion process for better text-image alignment.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>VLM Enhancement</h3>
+                    <p>Visual Language Models provide improved captions with domain-specific language instructions for realistic textures.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Flexible Fine-Tuning</h3>
+                    <p>Support for both standard fine-tuning and LoRA-based techniques to adapt models with limited computational resources.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-tools"></i>
+                    <h3>Complete Utilities</h3>
+                    <p>Built-in tools for metadata creation, caption generation, and style-based clustering of sonar images.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="architecture" class="architecture">
+        <div class="container">
+            <div class="section-title">
+                <h2>Architecture</h2>
+                <p>How Synth-SONAR combines multiple AI techniques for sonar image synthesis</p>
+            </div>
+            <div class="architecture-content">
+                <div class="arch-image">
+                    <img src="assets/Overall Architecture.jpg" alt="Synth-SONAR Architecture">
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 1.5rem;">Three-Phase Pipeline</h3>
+                    <ul class="phase-list">
+                        <li>
+                            <strong>Phase 1: Data Acquisition</strong>
+                            Gather publicly available sonar images, S3 simulated images, and stylized sonar images. Create low-level descriptions manually or via GPT.
+                        </li>
+                        <li>
+                            <strong>Phase 2: Training & Coarse Generation</strong>
+                            Use diffusion models with GPT-generated prompts to produce coarse sonar images. Fine-tune text transformers with LoRA for better alignment.
+                        </li>
+                        <li>
+                            <strong>Phase 3: Fine-Grained Tuning</strong>
+                            Apply a second diffusion model to refine coarse images. Use VLM with domain-specific instructions for enhanced realism and details.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="docs">
+        <div class="container">
+            <div class="section-title">
+                <h2>Documentation</h2>
+                <p>Everything you need to get started with Synth-SONAR</p>
+            </div>
+            <div class="docs-grid">
+                <a href="#setup" class="doc-card">
+                    <i class="fas fa-download"></i>
+                    <h3>Installation</h3>
+                    <p>Set up your development environment with conda and download required model weights.</p>
+                </a>
+                <a href="#style-injection" class="doc-card">
+                    <i class="fas fa-paint-brush"></i>
+                    <h3>Style Injection</h3>
+                    <p>Generate styled sonar images using Style-ID with Stable Diffusion.</p>
+                </a>
+                <a href="#finetuning" class="doc-card">
+                    <i class="fas fa-cog"></i>
+                    <h3>Fine-Tuning</h3>
+                    <p>Fine-tune diffusion models with standard training or LoRA for custom datasets.</p>
+                </a>
+                <a href="#inference" class="doc-card">
+                    <i class="fas fa-play"></i>
+                    <h3>Inference</h3>
+                    <p>Run inference with fine-tuned models to generate new sonar images.</p>
+                </a>
+                <a href="#metadata" class="doc-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Metadata & Captions</h3>
+                    <p>Create training metadata and generate captions using GPT or LLaMA.</p>
+                </a>
+                <a href="#clustering" class="doc-card">
+                    <i class="fas fa-object-group"></i>
+                    <h3>Style Clustering</h3>
+                    <p>Cluster sonar images by stylistic features using PCA and K-Means.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <section id="quickstart">
+        <div class="container">
+            <div class="section-title">
+                <h2>Quick Start</h2>
+                <p>Get started with Synth-SONAR in minutes</p>
+            </div>
+            
+            <h3 id="setup" style="margin-bottom: 20px; font-size: 1.5rem;">Installation</h3>
+            <div class="code-block">
+                <code># Clone the repository
+git clone https://github.com/Purushothaman-natarajan/Synth-SONAR.git
+cd Synth-SONAR
+
+# Create and activate conda environment
+conda env create -f environment.yaml
+conda activate Synth-SONAR
+
+# Download StableDiffusion weights
+# From https://huggingface.co/CompVis/stable-diffusion-v1-4-original
+ln -s &lt;path/to/model.ckpt&gt; models/ldm/stable-diffusion-v1/model.ckpt</code>
+            </div>
+            
+            <h3 id="style-injection" style="margin: 40px 0 20px; font-size: 1.5rem;">Step 1: Style Injection</h3>
+            <div class="code-block">
+                <code># Run with default configuration
+python run_styleid.py --cnt data/cnt --sty data/sty --gamma 0.75 --T 1.5
+
+# High style fidelity
+python run_styleid.py --cnt data/cnt --sty data/sty --gamma 0.3 --T 1.5</code>
+            </div>
+            
+            <h3 id="finetuning" style="margin: 40px 0 20px; font-size: 1.5rem;">Step 2: Fine-Tuning</h3>
+            <div class="code-block">
+                <code># Standard Fine-Tuning
+export MODEL_NAME="CompVis/stable-diffusion-v1-4"
+export TRAIN_DIR="path_to_your_dataset"
+
+accelerate launch --mixed_precision="fp16" ./text_to_image/train_text_to_image.py \
+  --pretrained_model_name_or_path=$MODEL_NAME \
+  --train_data_dir=$TRAIN_DIR \
+  --use_ema --resolution=512 --center_crop --random_flip \
+  --train_batch_size=1 --gradient_accumulation_steps=4 \
+  --gradient_checkpointing --max_train_steps=5000 \
+  --learning_rate=1e-05 --output_dir="sd-sonar-model"</code>
+            </div>
+            
+            <h3 id="inference" style="margin: 40px 0 20px; font-size: 1.5rem;">Step 3: Inference</h3>
+            <div class="code-block">
+                <code>from diffusers import StableDiffusionPipeline
+import torch
+
+model_path = "path_to_saved_model"
+pipe = StableDiffusionPipeline.from_pretrained(model_path, torch_dtype=torch.float16)
+pipe.to("cuda")
+
+image = pipe(prompt="A sonar image of an underwater scene").images[0]
+image.save("sonar_image.png")</code>
+            </div>
+            
+            <h3 style="margin: 40px 0 20px; font-size: 1.5rem;">Utility: Create Metadata</h3>
+            <div class="code-block">
+                <code>python create_metadata(data_to_json).py &lt;image_folder&gt;</code>
+            </div>
+            
+            <h3 style="margin: 40px 0 20px; font-size: 1.5rem;">Utility: Generate Captions</h3>
+            <div class="code-block">
+                <code># Using GPT-3.5 Turbo
+python generate_captions_GPT.py &lt;json_file&gt;
+
+# Using LLaMA
+python generate_captions_llama.py &lt;jsonl_file&gt; --batch_size 8</code>
+            </div>
+        </div>
+    </section>
+    
+    <section id="citation" class="citation">
+        <div class="container">
+            <div class="section-title">
+                <h2>Citation</h2>
+                <p>If you use Synth-SONAR in your research, please cite our paper</p>
+            </div>
+            <pre><code>@misc{natarajan2024synthsonar,
+  title={Synth-SONAR: Sonar Image Synthesis with Enhanced Diversity and Realism via Dual Diffusion Models and GPT Prompting},
+  author={Purushothaman Natarajan, Kamal Basha, Athira Nambiar},
+  year={2024},
+  eprint={2410.08612},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV}
+}</code></pre>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="links">
+                <a href="https://github.com/Purushothaman-natarajan/Synth-SONAR" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://www.arxiv.org/pdf/2410.08612" target="_blank"><i class="fas fa-file-pdf"></i> Paper</a>
+                <a href="https://purushothaman-natarajan.github.io/" target="_blank"><i class="fas fa-globe"></i> Author Website</a>
+            </div>
+            <p>Synth-SONAR &copy; 2024 Purushothaman Natarajan, Kamal Basha, Athira Nambiar</p>
+            <p style="margin-top: 10px; opacity: 0.7;">MIT License</p>
+        </div>
+    </footer>
+</body>
+</html>
